@@ -1,0 +1,9 @@
+name: SheepWarsJava
+version: '1.0-SNAPSHOT'
+main: me.holypite.sheepWarsJava.SheepWarsJava
+api-version: '1.21'
+commands:
+  giveallwool:
+    description: Donne toutes les laines personnalisées au joueur.
+    usage: /giveallwool
+    permission: op
