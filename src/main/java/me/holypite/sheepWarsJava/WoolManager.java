@@ -30,7 +30,7 @@ public class WoolManager {
     public static ItemStack spiderWool;
     public static ItemStack stormWool;
     public static ItemStack anvilWool;
-    public static ItemStack electricWool;
+    public static ItemStack eaterWool;
     public static ItemStack stickyWool;
     public static ItemStack fragmentationWool;
     public static ItemStack parasiteWool;
@@ -81,7 +81,7 @@ public class WoolManager {
         invisibleWool = createCustomWool("Mouton Invisible", "#FFFFFF", "#E0E0E0", "Se déplace sans être vu", 9);
         honeyWool = createCustomWool("Mouton Mielleux", "#FFD700", "#FFA500", "Ralentit les ennemis", 10);
         seekerWool = createCustomWool("Mouton Chercheur", "#8A2BE2", "#9400D3", "Pourchasse ses cibles", 11);
-        healWool = createCustomWool("Mouton Soin", "#00FF00", "#7CFC00", "Régénère la vie des alliés", 12);
+        healWool = createCustomWool("Mouton Soin", "#f3aeff", "#ff00ac", "Régénère la vie des alliés", 12);
         jawWool = createCustomWool("Mouton Mâchoire", "#800000", "#FF4500", "Invoque des entités agressives", 13);
         boardingWool = createCustomWool("Mouton Abordage", "#4682B4", "#5F9EA0", "Charge les ennemis", 14);
         incendiaryWool = createCustomWool("Mouton Incendiaire", "#FF4500", "#FF6347", "Met le feu partout", 15);
@@ -90,7 +90,7 @@ public class WoolManager {
         spiderWool = createCustomWool("Mouton Araignée", "#556B2F", "#6B8E23", "Tisse des toiles empoisonnées", 18);
         stormWool = createCustomWool("Mouton Tempétueux", "#708090", "#00CED1", "Déclenche des orages", 20);
         anvilWool = createCustomWool("Mouton Enclume", "#696969", "#A9A9A9", "Fait pleuvoir des enclumes", 21);
-        electricWool = createCustomWool("Mouton Électrique", "#FFFF00", "#FFD700", "Lâche des éclairs destructeurs", 22);
+        eaterWool = createCustomWool("Mouton Glouton", "#0d3d1b", "#30ff00", "Il a faim!", 22);
         stickyWool = createCustomWool("Mouton Gluant", "#32CD32", "#7FFF00", "Rend les ennemis collants", 23);
         fragmentationWool = createCustomWool("Mouton Fragmentation", "#FF8C00", "#FFA500", "Explose en plusieurs fragments", 24);
         parasiteWool = createCustomWool("Mouton Parasite", "#4B0082", "#8B008B", "Libère des créatures infectées", 25);
@@ -131,7 +131,7 @@ public class WoolManager {
             spiderWool,
             stormWool,
             anvilWool,
-            electricWool,
+            eaterWool,
             stickyWool,
             fragmentationWool,
             parasiteWool,

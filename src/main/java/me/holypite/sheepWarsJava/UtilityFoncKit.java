@@ -201,6 +201,34 @@ public class UtilityFoncKit {
     }
 
     /**
+     * Trouve toutes les entités dans un rayon donné.
+     *
+     * @param location La position à partir de laquelle chercher.
+     * @param radius Le rayon de recherche.
+     * @return La liste des entités dans le rayon.
+     */
+    public static List<Entity> getEntitiesInRadius(Location location, double radius) {
+        return location.getWorld().getNearbyEntities(location, radius, radius, radius).stream()
+                .toList();
+    }
+
+    /**
+     * Trouve les joueurs joueurs dans un rayon donnés.
+     *
+     * @param location La position à partir de laquelle chercher.
+     * @param radius Le rayon de recherche.
+     * @return La liste des joueurs dans le rayon.
+     */
+
+    public static List<Player> getPlayersInRadius(Location location, double radius) {
+        return location.getWorld().getNearbyEntities(location, radius, radius, radius).stream()
+                .filter(entity -> entity instanceof Player)
+                .map(entity -> (Player) entity)
+                .toList();
+    }
+
+
+    /**
      * Trouve le joueur le plus proche d'une position donnée.
      *
      * @param location La position à partir de laquelle chercher.
@@ -250,21 +278,6 @@ public class UtilityFoncKit {
         return entity.getLocation().getBlock().getRelative(BlockFace.DOWN).getType().isSolid();
     }
 
-    /**
-     * Fait une pause pendant un certain temps.
-     *
-     * @param seconds Le nombre de secondes pendant lesquelles faire une pause.
-     */
-    public static void pause(float seconds) {
-        try {
-            // Convertir les secondes en millisecondes et effectuer une pause
-            Thread.sleep((long) (seconds * 1000));
-        } catch (InterruptedException e) {
-            // Gérer les interruptions de thread
-            Thread.currentThread().interrupt();
-            System.err.println("Pause interrompue : " + e.getMessage());
-        }
-    }
 
     /**
      * Renvoie true avec un certain pourcentage de chance.

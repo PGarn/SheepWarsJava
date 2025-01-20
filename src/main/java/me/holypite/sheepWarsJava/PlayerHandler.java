@@ -21,7 +21,6 @@ import org.bukkit.util.Vector;
 
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
-import java.util.concurrent.TimeUnit;
 
 public class PlayerHandler implements Listener {
 
@@ -229,17 +228,6 @@ public class PlayerHandler implements Listener {
                                 block.setType(UtilityFoncKit.chance(0.3) ? Material.POWDER_SNOW : Material.SNOW_BLOCK);
                             }
                         }
-
-                        // Tirer une boule de neige
-                        sheep.getWorld().getNearbyEntities(sheep.getLocation(), 5, 5, 5).forEach(entity -> {
-                            if (entity instanceof Player player) {
-                                // Tirer une boule de neige en direction du joueur
-                                Vector direction = player.getLocation().toVector().subtract(sheep.getLocation().toVector()).normalize();
-                                Snowball ball = (Snowball) sheep.getWorld().spawnEntity(sheep.getLocation(), EntityType.SNOWBALL);
-                                ball.setVelocity(direction.multiply(1.5));
-
-                            }
-                        });
 
                         sheep.remove();
                         task.cancel();
@@ -484,6 +472,115 @@ public class PlayerHandler implements Listener {
                             block.setType(Material.valueOf(randomColor.name() + "_WOOL"));
                         }
 
+                        sheep.remove();
+                        task.cancel();
+                    }
+                }, 0L, 20L);
+            }
+
+            case "Mouton Geyser" -> {
+                int radius = 8;
+                int[] countdown = {3};
+
+                plugin.getServer().getScheduler().runTaskTimer(plugin, task -> {
+                    if (!sheep.isValid()) {
+                        sheep.remove();
+                        task.cancel();
+                    } else if (countdown[0] > 0) {
+                        countdown[0]--;
+                    } else {
+                        List<Player> playersInRange = UtilityFoncKit.getPlayersInRadius(sheep.getLocation(), radius);
+                        for (Player player : playersInRange) {
+                            // Projette le joueur violemment dans les airs
+                            Vector upward = new Vector(0, 2.5, 0);
+                            player.setVelocity(upward);
+                            player.getWorld().spawnParticle(Particle.SPLASH, player.getLocation(), 50);
+                            // Planifier la projection vers le sol
+                            plugin.getServer().getScheduler().runTaskLater(plugin, () -> {
+                                Vector downward = new Vector(0, -2.5, 0);
+                                player.setVelocity(player.getVelocity().add(downward));
+                            }, 20L); // 1 seconde après
+                        }
+
+                        // Supprimer le mouton après activation
+                        sheep.remove();
+                        task.cancel();
+                    }
+                }, 0L, 20L);
+            }
+
+            case "Mouton Tempétueux" -> {
+                int radius = 10;
+                int[] countdown = {3};
+
+                plugin.getServer().getScheduler().runTaskTimer(plugin, task -> {
+                    if (!sheep.isValid()) {
+                        sheep.remove();
+                        task.cancel();
+                    } else if (countdown[0] > 0) {
+                        countdown[0]--;
+                    } else {
+                        List<Player> playersInRange = UtilityFoncKit.getPlayersInRadius(sheep.getLocation(), radius);
+                        for (Player player : playersInRange) {
+                            // Fait tomber un éclair
+                            sheep.getWorld().strikeLightningEffect(player.getLocation());
+
+                            // Projette le joueur dans la direction opposée
+                            Vector pushDirection = player.getLocation().toVector()
+                                    .subtract(sheep.getLocation().toVector()).normalize().multiply(2);
+                            player.setVelocity(pushDirection);
+                        }
+
+                        // Effet visuel
+                        sheep.getWorld().spawnParticle(Particle.CLOUD, sheep.getLocation(), 30);
+
+                        // Supprimer le mouton après activation
+                        sheep.remove();
+                        task.cancel();
+                    }
+                }, 0L, 20L);
+            }
+
+            case "Mouton Tremblement de Terre" -> {
+                int radius = 5;
+                int[] durationTicks = {3 * 20}; // 3 secondes
+                int[] countdown = {3};
+
+                plugin.getServer().getScheduler().runTaskTimer(plugin, task -> {
+                    if (!sheep.isValid()) {
+                        sheep.remove();
+                        task.cancel();
+                    } else if (countdown[0] > 0) {
+                        countdown[0]--;
+                    } else if (durationTicks[0] > 0) {
+                        List<Player> playersInRange = UtilityFoncKit.getPlayersInRadius(sheep.getLocation(), radius);
+                        for (Player player : playersInRange) {
+                            // Projette le joueur un peu en l'air dans une direction aléatoire
+                            Vector randomDirection = new Vector(
+                                    ThreadLocalRandom.current().nextDouble(-0.5, 0.5),
+                                    0.8,
+                                    ThreadLocalRandom.current().nextDouble(-0.5, 0.5)
+                            );
+                            player.setVelocity(randomDirection);
+                        }
+
+                        // Détruit des blocs dans le rayon
+                        List<Block> blocks = UtilityFoncKit.getBlocksInSphere(sheep.getLocation(), radius);
+                        for (Block block : blocks) {
+                            if (UtilityFoncKit.chance(0.2)) { // 20% de chance
+                                block.setType(Material.AIR);
+                            }
+                        }
+
+                        // Effet visuel
+                        sheep.getWorld().spawnParticle(Particle.BLOCK, sheep.getLocation(), 100,
+                                Material.DIRT.createBlockData());
+
+                        // Réduire la durée
+                        durationTicks[0] -= 20; // 1 seconde
+                    } else {
+                        // Fin de l'effet
+                        sheep.getWorld().spawnParticle(Particle.EXPLOSION, sheep.getLocation(), 1);
                         sheep.remove();
                         task.cancel();
                     }
