@@ -96,46 +96,15 @@ public class PlayerHandler implements Listener {
                     // Marquer le mouton comme ayant activé son pouvoir
                     sheep.setMetadata("Activated", new FixedMetadataValue(plugin, true));
                     // Activer le pouvoir du mouton
-                    activateOnGroundSheepPower(sheep);
+                    activateSheepPower(sheep);
                 }
             }
         }
     }
 
-    private void activateOnGroundSheepPower(Sheep sheep) {
+    private void activateSheepPower(Sheep sheep) {
         plugin.getServer().getScheduler().runTaskLater(plugin, task -> applySheepPower(sheep),20);
     }
-
-    /**
-     * Renvoie un composant représentant le nom d'un mouton aléatoire avec son gradient de couleur.
-     *
-     * @return Un composant contenant le nom d'un mouton aléatoire.
-     */
-    public static Component getRandomSheepComponent() {
-        // Tableau des noms de moutons avec leurs couleurs associées
-        Object[][] sheepData = {
-                {"Mouton Explosif", "#FF0000", "#8B0000"},
-                {"Mouton Trou Noir", "#000000", "#4B0082"},
-                {"Mouton Glacial", "#87CEEB", "#00FFFF"},
-                {"Mouton Gluant", "#32CD32", "#7FFF00"},
-                {"Mouton Mielleux", "#FFD700", "#FFA500"},
-                {"Mouton Incendiaire", "#FF4500", "#FF6347"},
-                {"Mouton Enfouisseur", "#8B4513", "#A0522D"},
-                {"Mouton Parasite", "#4B0082", "#8B008B"}
-        };
-
-        // Choisir un mouton aléatoire
-        int randomIndex = ThreadLocalRandom.current().nextInt(sheepData.length);
-        String name = (String) sheepData[randomIndex][0];
-        String startColor = (String) sheepData[randomIndex][1];
-        String endColor = (String) sheepData[randomIndex][2];
-
-        // Créer et renvoyer le composant avec le gradient
-        TextColor start = TextColor.fromHexString(startColor);
-        TextColor end = TextColor.fromHexString(endColor);
-        return UtilityFoncKit.createGradientText(name, start, end);
-    }
-
 
     private void applySheepPower(Sheep sheep) {
         // Récupérer le nom du mouton
@@ -591,6 +560,36 @@ public class PlayerHandler implements Listener {
                 sheep.remove();
             }
         }
+    }
+
+    /**
+     * Renvoie un composant représentant le nom d'un mouton aléatoire avec son gradient de couleur.
+     *
+     * @return Un composant contenant le nom d'un mouton aléatoire.
+     */
+    public static Component getRandomSheepComponent() {
+        // Tableau des noms de moutons avec leurs couleurs associées
+        Object[][] sheepData = {
+                {"Mouton Explosif", "#FF0000", "#8B0000"},
+                {"Mouton Trou Noir", "#000000", "#4B0082"},
+                {"Mouton Glacial", "#87CEEB", "#00FFFF"},
+                {"Mouton Gluant", "#32CD32", "#7FFF00"},
+                {"Mouton Mielleux", "#FFD700", "#FFA500"},
+                {"Mouton Incendiaire", "#FF4500", "#FF6347"},
+                {"Mouton Enfouisseur", "#8B4513", "#A0522D"},
+                {"Mouton Parasite", "#4B0082", "#8B008B"}
+        };
+
+        // Choisir un mouton aléatoire
+        int randomIndex = ThreadLocalRandom.current().nextInt(sheepData.length);
+        String name = (String) sheepData[randomIndex][0];
+        String startColor = (String) sheepData[randomIndex][1];
+        String endColor = (String) sheepData[randomIndex][2];
+
+        // Créer et renvoyer le composant avec le gradient
+        TextColor start = TextColor.fromHexString(startColor);
+        TextColor end = TextColor.fromHexString(endColor);
+        return UtilityFoncKit.createGradientText(name, start, end);
     }
 
 }
