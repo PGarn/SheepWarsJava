@@ -89,10 +89,11 @@ public class PlayerHandler implements Listener {
     public void onSheepTouchGround(EntityMoveEvent event) {
         // Vérifier si l'entité est un mouton
         if (event.getEntity() instanceof Sheep sheep) {
-            // Vérifier si le mouton est sur un bloc solide
-            if (UtilityFoncKit.isEntityOnSolidBlock(sheep)) {
-                // Vérifier si le mouton a un nom personnalisé et s'il n'a pas encore activé son pouvoir
-                if (sheep.customName() != null && !sheep.hasMetadata("Activated")) {
+            // Vérifier si le mouton a un nom personnalisé et s'il n'a pas encore activé son pouvoir
+            if (sheep.customName() != null && !sheep.hasMetadata("Activated")) {
+                // Vérifier si le mouton est sur un bloc solide
+                List<String> validSheepNames = List.of("Mouton d'abordage", "Mouton Glouton", "Mouton Taupe");
+                if (UtilityFoncKit.isEntityOnSolidBlock(sheep) || validSheepNames.contains(UtilityFoncKit.extractPlainText(sheep.customName()))) {
                     // Marquer le mouton comme ayant activé son pouvoir
                     sheep.setMetadata("Activated", new FixedMetadataValue(plugin, true));
                     // Activer le pouvoir du mouton
@@ -120,7 +121,7 @@ public class PlayerHandler implements Listener {
                         task.cancel();
                     } else if (countdown[0] > 0) {
                         // Afficher le compte à rebours dans le nom
-                        sheep.customName(Component.text(String.valueOf(countdown[0])));
+                        // sheep.customName(Component.text(String.valueOf(countdown[0])));
                         countdown[0]--; // Réduire le compteur
                     } else {
                         // Explosion et suppression du mouton
@@ -554,6 +555,71 @@ public class PlayerHandler implements Listener {
                         task.cancel();
                     }
                 }, 0L, 20L);
+            }
+
+            case "Mouton Taupe" -> {
+                int duration = 5 * 20; // Durée de vie du mouton (5 secondes)
+                int radius = 2; // Rayon pour détruire les blocs
+                int[] ticksRemaining = {duration};
+
+                plugin.getServer().getScheduler().runTaskTimer(plugin, task -> {
+                    if (!sheep.isValid()) {
+                        sheep.remove();
+                        task.cancel();
+                    } else if (ticksRemaining[0] > 0) {
+                        // Détruire les blocs autour du mouton
+                        List<Block> blocksInRadius = UtilityFoncKit.getBlocksInSphere(sheep.getLocation(), radius);
+                        for (Block block : blocksInRadius) {
+                            if (block.getType().isSolid()) {
+                                block.setType(Material.AIR); // Détruire le bloc
+                                // Effet visuel
+                                sheep.getWorld().spawnParticle(Particle.BLOCK, block.getLocation(), 10, block.getBlockData());
+                            }
+                        }
+
+                        ticksRemaining[0] -= 2; // Réduire la durée restante
+                    } else {
+                        // Fin de l'effet
+                        sheep.getWorld().spawnParticle(Particle.EXPLOSION, sheep.getLocation(), 1);
+                        sheep.remove();
+                        task.cancel();
+                    }
+                }, 0L, 2L); // Répéter toutes les 2 ticks
+            }
+
+            case "Mouton Glouton" -> {
+                int duration = 7 * 20; // Durée de vie du mouton (7 secondes)
+                int radius = 3; // Rayon pour détruire les blocs
+                int[] ticksRemaining = {duration};
+
+                // Supprimer la gravité et définir une vitesse constante
+                sheep.setGravity(false);
+                Vector constantVelocity = sheep.getLocation().getDirection().normalize().multiply(0.5);
+                sheep.setVelocity(constantVelocity);
+
+                plugin.getServer().getScheduler().runTaskTimer(plugin, task -> {
+                    if (!sheep.isValid()) {
+                        sheep.remove();
+                        task.cancel();
+                    } else if (ticksRemaining[0] > 0) {
+                        // Détruire les blocs autour du mouton
+                        List<Block> blocksInRadius = UtilityFoncKit.getBlocksInSphere(sheep.getLocation(), radius);
+                        for (Block block : blocksInRadius) {
+                            if (block.getType().isSolid()) {
+                                block.setType(Material.AIR); // Détruire le bloc
+                                // Effet visuel
+                                sheep.getWorld().spawnParticle(Particle.BLOCK, block.getLocation(), 10, block.getBlockData());
+                            }
+                        }
+
+                        ticksRemaining[0] -= 2; // Réduire la durée restante
+                    } else {
+                        // Fin de l'effet
+                        sheep.getWorld().spawnParticle(Particle.EXPLOSION, sheep.getLocation(), 1);
+                        sheep.remove();
+                        task.cancel();
+                    }
+                }, 0L, 2L); // Répéter toutes les 2 ticks
             }
 
             default -> {
