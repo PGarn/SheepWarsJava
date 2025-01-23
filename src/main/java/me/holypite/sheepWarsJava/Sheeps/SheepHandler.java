@@ -2,7 +2,7 @@ package me.holypite.sheepWarsJava.Sheeps;
 
 import io.papermc.paper.event.entity.EntityMoveEvent;
 import me.holypite.sheepWarsJava.SheepWarsJava;
-import me.holypite.sheepWarsJava.UtilityFoncKit;
+import me.holypite.sheepWarsJava.Tools.UtilityFoncKit;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.*;

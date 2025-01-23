@@ -3,7 +3,18 @@ version: '1.0-SNAPSHOT'
 main: me.holypite.sheepWarsJava.SheepWarsJava
 api-version: '1.21'
 commands:
+
   giveallwool:
     description: Donne toutes les laines personnalisées au joueur.
     usage: /giveallwool
+    permission: op
+
+  createworld:
+    description: Crée un monde vide avec le nom spécifié.
+    usage: /createworld <nom_du_monde>
+    permission: op
+
+  deleteworld:
+    description: Supprime un monde avec le nom spécifié.
+    usage: /deleteworld <nom_du_monde>
     permission: op

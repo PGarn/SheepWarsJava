@@ -20,7 +20,9 @@ public class LobbyManager implements Listener {
         new BukkitRunnable() {
             @Override
             public void run() {
-                if (Bukkit.getOnlinePlayers().size() >= GameManager.getMinPlayers()) {
+                if (gameManager == null){
+                    System.out.println("gameManager est null.");
+                } else if (gameManager.lobbyWorld.getPlayers().size() >= GameManager.getMinPlayers()) {
                     gameManager.startGame();
                     cancel();
                 }

@@ -18,23 +18,25 @@ import java.util.Random;
 public class GameManager implements Listener {
 
     private final SheepWarsJava plugin;
-    private World gameWorld;
+    public World lobbyWorld;
+    public World gameWorld;
     private List<Player> team1 = new ArrayList<>();
     private List<Player> team2 = new ArrayList<>();
     private List<Player> spectators = new ArrayList<>();
     private final Location lobbySpawn;
-    private static final int minPlayers = 4;
+    private static final int minPlayers = 2;
     private boolean gameStarted = false;
     private final MapManager mapManager;
 
     public GameManager(SheepWarsJava plugin) {
         this.plugin = plugin;
-        this.lobbySpawn = new Location(Bukkit.getWorld("lobby_sheepwars-1"), 0, 64, 0);
+        this.lobbyWorld = Bukkit.getWorld("lobby_sheepwars-1");
+        this.lobbySpawn = new Location(lobbyWorld, 0, 64, 0);
         this.mapManager = new MapManager();
     }
 
     public void startGame() {
-        if (Bukkit.getOnlinePlayers().size() >= minPlayers && !gameStarted) {
+        if (gameWorld.getPlayers().size() >= minPlayers && !gameStarted) {
             gameStarted = true;
             gameWorld = WorldManager.createNewGameWorld();
             assignTeams();
@@ -57,7 +59,7 @@ public class GameManager implements Listener {
     }
 
     private void assignTeams() {
-        List<Player> players = new ArrayList<>(Bukkit.getOnlinePlayers());
+        List<Player> players = new ArrayList<>(gameWorld.getPlayers());
         Random random = new Random();
         while (!players.isEmpty()) {
             Player player = players.remove(random.nextInt(players.size()));
@@ -96,7 +98,7 @@ public class GameManager implements Listener {
 
     private void endGame() {
         gameStarted = false;
-        for (Player player : Bukkit.getOnlinePlayers()) {
+        for (Player player : gameWorld.getPlayers()) {
             player.teleport(lobbySpawn);
         }
         team1.clear();
