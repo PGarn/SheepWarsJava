@@ -1,5 +1,6 @@
-package me.holypite.sheepWarsJava;
+package me.holypite.sheepWarsJava.Sheeps;
 
+import me.holypite.sheepWarsJava.UtilityFoncKit;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Material;

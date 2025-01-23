@@ -1,13 +1,14 @@
-package me.holypite.sheepWarsJava;
+package me.holypite.sheepWarsJava.Sheeps;
 
 import io.papermc.paper.event.entity.EntityMoveEvent;
+import me.holypite.sheepWarsJava.SheepWarsJava;
+import me.holypite.sheepWarsJava.UtilityFoncKit;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
-import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.*;
 import org.bukkit.event.entity.EntityDismountEvent;
 import org.bukkit.inventory.meta.PotionMeta;
@@ -26,11 +27,11 @@ import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.ThreadLocalRandom;
 
-public class PlayerHandler implements Listener {
+public class SheepHandler implements Listener {
 
     private final SheepWarsJava plugin;
 
-    public PlayerHandler(SheepWarsJava plugin) {
+    public SheepHandler(SheepWarsJava plugin) {
         // Enregistrer les événements
         this.plugin = plugin;
         Bukkit.getPluginManager().registerEvents(this, plugin);

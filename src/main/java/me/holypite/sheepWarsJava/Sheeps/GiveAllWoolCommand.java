@@ -1,4 +1,4 @@
-package me.holypite.sheepWarsJava;
+package me.holypite.sheepWarsJava.Sheeps;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
