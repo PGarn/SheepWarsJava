@@ -2,14 +2,18 @@ package me.holypite.sheepWarsJava;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
+import org.bukkit.*;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
-import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Entity;
+import org.bukkit.potion.PotionEffectType;
+import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -213,13 +217,27 @@ public class UtilityFoncKit {
     }
 
     /**
-     * Trouve les joueurs joueurs dans un rayon donnés.
+     * Calcule la direction entre deux locations.
+     *
+     * @param from La position de départ.
+     * @param to La position de destination.
+     * @return Un vecteur normalisé représentant la direction de "from" vers "to".
+     */
+    public static Vector getDirection(Location from, Location to) {
+        if (from.equals(to)) {
+            return new Vector(0, 0, 0); // Retourne un vecteur nul si les positions sont identiques
+        }
+        return to.toVector().subtract(from.toVector()).normalize();
+    }
+
+
+    /**
+     * Trouve les joueurs dans un rayon donnés.
      *
      * @param location La position à partir de laquelle chercher.
      * @param radius Le rayon de recherche.
      * @return La liste des joueurs dans le rayon.
      */
-
     public static List<Player> getPlayersInRadius(Location location, double radius) {
         return location.getWorld().getNearbyEntities(location, radius, radius, radius).stream()
                 .filter(entity -> entity instanceof Player)
@@ -266,18 +284,16 @@ public class UtilityFoncKit {
         }
     }
 
-
     /**
      * Vérifie si une entité est sur un bloc solide.
      *
-     * @param entity L'entité à vérifier.
+     * @param entity L'entité a vérifié
      * @return True si l'entité est sur un bloc solide, sinon false.
      */
     public static boolean isEntityOnSolidBlock(Entity entity) {
         // Vérifie si le bloc sous l'entité est solide
-        return entity.getLocation().getBlock().getRelative(BlockFace.DOWN).getType().isSolid();
+        return !(Math.abs(entity.getVelocity().getY()) > 0.05 || areAllBlocksAir(getBlocksUnder(entity.getLocation())));
     }
-
 
     /**
      * Renvoie true avec un certain pourcentage de chance.
@@ -291,7 +307,6 @@ public class UtilityFoncKit {
         }
         return ThreadLocalRandom.current().nextDouble() < chance;
     }
-
 
     /**
      * Retourne une liste des blocs dans un rayon donné autour d'une localisation.
@@ -323,13 +338,13 @@ public class UtilityFoncKit {
      * @param radius Le rayon de recherche.
      * @return Une liste des blocs dans le rayon.
      */
-    public static List<Block> getBlocksInSphere(Location center, int radius) {
+    public static List<Block> getBlocksInSphere(Location center, double radius) {
         List<Block> blocks = new ArrayList<>();
         double radiusSquared = radius * radius; // Distance au carré pour éviter les racines carrées inutiles
 
-        for (int x = -radius; x <= radius; x++) {
-            for (int y = -radius; y <= radius; y++) {
-                for (int z = -radius; z <= radius; z++) {
+        for (double x = -radius; x <= radius; x++) {
+            for (double y = -radius; y <= radius; y++) {
+                for (double z = -radius; z <= radius; z++) {
                     Location blockLoc = center.clone().add(x, y, z);
                     // Vérifier si la distance au centre est dans le rayon
                     if (blockLoc.distanceSquared(center) <= radiusSquared) {
@@ -343,5 +358,141 @@ public class UtilityFoncKit {
         }
         return blocks;
     }
+
+    /**
+     * Retourne les 9 blocs sous une localisation, incluant le bloc directement en dessous
+     * et les 8 blocs adjacents dans le plan X-Z.
+     *
+     * @param center La localisation centrale (par exemple, la position d'une entité).
+     * @return Une liste des 9 blocs sous la localisation.
+     */
+    public static List<Block> getBlocksUnder(Location center) {
+        List<Block> blocks = new ArrayList<>();
+        Location baseLocation = center.clone().subtract(0, 1, 0); // Décalage vers le bas (sous l'entité)
+
+        for (int x = -1; x <= 1; x++) {
+            for (int z = -1; z <= 1; z++) {
+                // Obtenir le bloc aux coordonnées (x, y-1, z) par rapport à la localisation centrale
+                Location blockLocation = baseLocation.clone().add(x, 0, z);
+                Block block = blockLocation.getBlock();
+                blocks.add(block);
+            }
+        }
+        return blocks;
+    }
+
+    /**
+     * Renvoie une liste des blocs d'air libre situés au-dessus des blocs solides dans la liste donnée.
+     *
+     * @param blocks La liste des blocs à analyser.
+     * @return Une liste des blocs d'air libre situés au-dessus des blocs solides.
+     */
+    public static List<Block> getOpenAirBlocksAbove(List<Block> blocks) {
+        List<Block> openAirBlocks = new ArrayList<>();
+        for (Block block : blocks) {
+            if (block.getType().isSolid() && !block.getRelative(BlockFace.UP).getType().isSolid()) {
+                // Ajouter le bloc d'air au-dessus à la liste
+                openAirBlocks.add(block.getRelative(BlockFace.UP));
+            }
+        }
+        return openAirBlocks;
+    }
+
+    /**
+     * Génère une couleur de teinture aléatoire.
+     *
+     * @return Une valeur aléatoire de DyeColor.
+     */
+    public static DyeColor getRandomDyeColor() {
+        DyeColor[] colors = DyeColor.values();
+        return colors[ThreadLocalRandom.current().nextInt(colors.length)];
+    }
+
+    public static boolean areAllBlocksAir(List<Block> blocks) {
+        for (Block block : blocks) {
+            // Si un bloc n'est pas de l'air, retourne false
+            if (block.getType() != Material.AIR && block.getType() != Material.VOID_AIR && block.getType() != Material.CAVE_AIR) {
+                return false;
+            }
+        }
+        // Tous les blocs sont de l'air
+        return true;
+    }
+
+    /**
+     * Retourne une liste des effets de potion correspondant à la catégorie donnée.
+     *
+     * @param category "Positif", "Négatif", ou "Neutre".
+     * @return Une liste des effets de potion dans la catégorie spécifiée.
+     */
+    public static List<PotionEffectType> getPotionEffectsByCategory(String category) {
+        List<PotionEffectType> positiveEffects = List.of(
+                PotionEffectType.ABSORPTION,
+                PotionEffectType.CONDUIT_POWER,
+                PotionEffectType.DOLPHINS_GRACE,
+                PotionEffectType.FIRE_RESISTANCE,
+                PotionEffectType.HEALTH_BOOST,
+                PotionEffectType.HERO_OF_THE_VILLAGE,
+                PotionEffectType.INSTANT_HEALTH,
+                PotionEffectType.INVISIBILITY,
+                PotionEffectType.JUMP_BOOST,
+                PotionEffectType.LUCK,
+                PotionEffectType.NIGHT_VISION,
+                PotionEffectType.REGENERATION,
+                PotionEffectType.RESISTANCE,
+                PotionEffectType.SATURATION,
+                PotionEffectType.SLOW_FALLING,
+                PotionEffectType.SPEED,
+                PotionEffectType.STRENGTH,
+                PotionEffectType.WATER_BREATHING
+        );
+
+        List<PotionEffectType> negativeEffects = List.of(
+                PotionEffectType.BAD_OMEN,
+                PotionEffectType.BLINDNESS,
+                PotionEffectType.DARKNESS,
+                PotionEffectType.HUNGER,
+                PotionEffectType.INSTANT_DAMAGE,
+                PotionEffectType.LEVITATION,
+                PotionEffectType.MINING_FATIGUE,
+                PotionEffectType.NAUSEA,
+                PotionEffectType.POISON,
+                PotionEffectType.SLOWNESS,
+                PotionEffectType.UNLUCK,
+                PotionEffectType.WEAKNESS,
+                PotionEffectType.WITHER
+        );
+
+        List<PotionEffectType> neutralEffects = List.of(
+                PotionEffectType.GLOWING,
+                PotionEffectType.OOZING,
+                PotionEffectType.RAID_OMEN,
+                PotionEffectType.TRIAL_OMEN,
+                PotionEffectType.WEAVING,
+                PotionEffectType.WIND_CHARGED
+        );
+
+        return switch (category.toLowerCase()) {
+            case "positif" -> positiveEffects;
+            case "négatif" -> negativeEffects;
+            case "neutre" -> neutralEffects;
+            default -> throw new IllegalArgumentException("Catégorie invalide : " + category);
+        };
+    }
+
+    /**
+     * Sélectionne un effet de potion aléatoire dans la liste donnée.
+     *
+     * @param effects La liste des effets de potion.
+     * @return Un effet de potion aléatoire.
+     */
+    public static PotionEffectType getRandomPotionEffect(List<PotionEffectType> effects) {
+        if (effects.isEmpty()) {
+            throw new IllegalArgumentException("La liste des effets de potion est vide.");
+        }
+        return effects.get(ThreadLocalRandom.current().nextInt(effects.size()));
+    }
+
+
 
 }
