@@ -18,3 +18,13 @@ commands:
     description: Supprime un monde avec le nom spécifié.
     usage: /deleteworld <nom_du_monde>
     permission: op
+
+  savestructure:
+    description: Enregistre une structure dans un fichier NBT.
+    usage: /savestructure <nom> <x1> <y1> <z1> <x2> <y2> <z2>
+    permission: op
+
+  loadstructure:
+    description: Charge et place une structure depuis un fichier NBT.
+    usage: /loadstructure <nom> <x> <y> <z>
+    permission: op

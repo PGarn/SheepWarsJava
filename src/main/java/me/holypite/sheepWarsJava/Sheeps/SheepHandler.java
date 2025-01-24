@@ -2,7 +2,7 @@ package me.holypite.sheepWarsJava.Sheeps;
 
 import io.papermc.paper.event.entity.EntityMoveEvent;
 import me.holypite.sheepWarsJava.SheepWarsJava;
-import me.holypite.sheepWarsJava.Tools.UtilityFoncKit;
+import me.holypite.sheepWarsJava.Tools.TKit;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.*;
@@ -98,12 +98,12 @@ public class SheepHandler implements Listener {
             if (sheep.customName() != null && !sheep.hasMetadata("Activated")) {
                 // Vérifier si le mouton est sur un bloc solide
                 List<String> validSheepNames = List.of("Mouton Abordage", "Mouton Glouton", "Mouton Taupe","Mouton Mystère");
-                if (UtilityFoncKit.isEntityOnSolidBlock(sheep)) {
+                if (TKit.isEntityOnSolidBlock(sheep)) {
                     // Marquer le mouton comme ayant activé son pouvoir
                     sheep.setMetadata("Activated", new FixedMetadataValue(plugin, true));
                     // Activer le pouvoir du mouton après 1 seconde
                     plugin.getServer().getScheduler().runTaskLater(plugin, task -> {applySheepPower(sheep);},20);
-                } else if (validSheepNames.contains(UtilityFoncKit.extractPlainText(sheep.customName()))) {
+                } else if (validSheepNames.contains(TKit.extractPlainText(sheep.customName()))) {
                     // Marquer le mouton comme ayant activé son pouvoir
                     sheep.setMetadata("Activated", new FixedMetadataValue(plugin, true));
                     // Activer le pouvoir du mouton après 1 seconde
@@ -121,7 +121,7 @@ public class SheepHandler implements Listener {
         // Vérifier si l'entité démontée est un mouton et qu'il s'agit du mouton abordage
         if (dismounted instanceof Sheep sheep && dismounting instanceof Player) {
             // Vérifier si le mouton est un Mouton Abordage
-            if (UtilityFoncKit.extractPlainText(sheep.customName()).equals("Mouton Abordage")) {
+            if (TKit.extractPlainText(sheep.customName()).equals("Mouton Abordage")) {
                 // Supprimer le mouton
                 sheep.remove();
 
@@ -143,10 +143,10 @@ public class SheepHandler implements Listener {
 
                 if (woolItem != null) {
                     // Donner la laine au joueur
-                    UtilityFoncKit.giveItems(killerPlayer,woolItem);
+                    TKit.giveItems(killerPlayer,woolItem);
 
                     // Message de confirmation
-                    killerPlayer.sendMessage("Vous avez obtenu une " + UtilityFoncKit.extractPlainText(woolItem.getItemMeta().customName()) + " !");
+                    killerPlayer.sendMessage("Vous avez obtenu une " + TKit.extractPlainText(woolItem.getItemMeta().customName()) + " !");
                 }
             }
         }
@@ -154,11 +154,11 @@ public class SheepHandler implements Listener {
 
     private void applySheepPower(Sheep sheep) {
         // Récupérer le nom du mouton
-        String sheepName = UtilityFoncKit.extractPlainText(sheep.customName());
+        String sheepName = TKit.extractPlainText(sheep.customName());
         switch (sheepName) {
 
             case "Mouton Abordage" -> {
-                Player player = UtilityFoncKit.getNearestPlayer(sheep.getLocation()); // Le joueur doit chevaucher le mouton
+                Player player = TKit.getNearestPlayer(sheep.getLocation(),true); // Le joueur doit chevaucher le mouton
                 sheep.addPassenger(player); // Forcer le joueur à monter sur le mouton
 
                 int duration = 10 * 20; // Durée de vie
@@ -203,15 +203,15 @@ public class SheepHandler implements Listener {
                         task.cancel();
                     } else {
                         // Transformer les blocs autour en toiles d'araignée
-                        List<Block> blocksInRadius = UtilityFoncKit.getBlocksInSphere(sheep.getLocation(), radius);
+                        List<Block> blocksInRadius = TKit.getBlocksInSphere(sheep.getLocation(), radius);
                         for (Block block : blocksInRadius) {
-                            if (UtilityFoncKit.chance(chance)) {
+                            if (TKit.chance(chance)) {
                                 block.setType(Material.COBWEB); // Transformer en toile d'araignée
                             }
                         }
 
                         // Appliquer un effet de poison aux joueurs dans le rayon
-                        List<Player> playersInRadius = UtilityFoncKit.getPlayersInRadius(sheep.getLocation(), radius);
+                        List<Player> playersInRadius = TKit.getPlayersInRadius(sheep.getLocation(), radius, true);
                         for (Player player : playersInRadius) {
                             player.addPotionEffect(new PotionEffect(PotionEffectType.POISON, 4*20, 0)); // Poison pendant 4 secondes
                         }
@@ -302,10 +302,10 @@ public class SheepHandler implements Listener {
                         // Transformer des blocs proches en pierre infestée et spawn des créatures
                         int radius = 5;
                         double chance = 0.7; // 70% de chance
-                        List<Block> blocks = UtilityFoncKit.getBlocksInSphere(sheep.getLocation(), radius);
+                        List<Block> blocks = TKit.getBlocksInSphere(sheep.getLocation(), radius);
                         for (Block block : blocks) {
-                            if (UtilityFoncKit.chance(chance) && block.getType().isSolid()) {
-                                block.setType(UtilityFoncKit.chance(0.3) ? Material.POWDER_SNOW : Material.SNOW_BLOCK);
+                            if (TKit.chance(chance) && block.getType().isSolid()) {
+                                block.setType(TKit.chance(0.3) ? Material.POWDER_SNOW : Material.SNOW_BLOCK);
                             }
                         }
 
@@ -329,9 +329,9 @@ public class SheepHandler implements Listener {
                         // Transformer des blocs proches en pierre infestée et spawn des créatures
                         int radius = 5;
                         double chance = 0.7; // 70% de chance
-                        List<Block> blocks = UtilityFoncKit.getBlocksInSphere(sheep.getLocation(), radius);
+                        List<Block> blocks = TKit.getBlocksInSphere(sheep.getLocation(), radius);
                         for (Block block : blocks) {
-                            if (UtilityFoncKit.chance(chance) && block.getType().isSolid()) {
+                            if (TKit.chance(chance) && block.getType().isSolid()) {
                                 block.setType(Material.SLIME_BLOCK);
                             }
                         }
@@ -339,7 +339,7 @@ public class SheepHandler implements Listener {
                         // Faire spawn 3 slimes
                         for (int i = 0; i < 3; i++) {
                             Slime slime = (Slime) sheep.getWorld().spawnEntity(sheep.getLocation(), EntityType.SLIME);
-                            slime.setSize(UtilityFoncKit.chance(0.7) ? 1 : 2);
+                            slime.setSize(TKit.chance(0.7) ? 1 : 2);
                         }
 
                         sheep.remove();
@@ -362,9 +362,9 @@ public class SheepHandler implements Listener {
                         // Transformer des blocs proches en pierre infestée et spawn des créatures
                         int radius = 5;
                         double chance = 0.7; // 70% de chance
-                        List<Block> blocks = UtilityFoncKit.getBlocksInSphere(sheep.getLocation(), radius);
+                        List<Block> blocks = TKit.getBlocksInSphere(sheep.getLocation(), radius);
                         for (Block block : blocks) {
-                            if (UtilityFoncKit.chance(chance) && block.getType().isSolid()) {
+                            if (TKit.chance(chance) && block.getType().isSolid()) {
                                 block.setType(Material.HONEY_BLOCK);
                             }
                         }
@@ -403,10 +403,10 @@ public class SheepHandler implements Listener {
 
                         // Enflammer les blocs proches
                         double chance = 0.7; // 70% de chance
-                        List<Block> blocks = UtilityFoncKit.getBlocksInSphere(sheep.getLocation(), radius);
+                        List<Block> blocks = TKit.getBlocksInSphere(sheep.getLocation(), radius);
                         for (Block block : blocks) {
                             if (block.getType().isSolid() && block.getRelative(BlockFace.UP).getType() == Material.AIR) {
-                                if (UtilityFoncKit.chance(chance) ) {
+                                if (TKit.chance(chance) ) {
                                     block.getRelative(BlockFace.UP).setType(Material.FIRE);
                                 }
                             }
@@ -433,9 +433,9 @@ public class SheepHandler implements Listener {
                         // Transformer les blocs proches en TNT avec un pourcentage de chance
                         int radius = 5;
                         double chance = 0.05; // 5% de chance
-                        List<Block> blocks = UtilityFoncKit.getBlocksInSphere(sheep.getLocation(), radius);
+                        List<Block> blocks = TKit.getBlocksInSphere(sheep.getLocation(), radius);
                         for (Block block : blocks) {
-                            if (UtilityFoncKit.chance(chance) && block.getType().isSolid()) {
+                            if (TKit.chance(chance) && block.getType().isSolid()) {
                                 block.setType(Material.TNT);
                             }
                         }
@@ -459,9 +459,9 @@ public class SheepHandler implements Listener {
                         // Transformer des blocs proches en pierre infestée et spawn des créatures
                         int radius = 5;
                         double chance = 0.2; // 20% de chance
-                        List<Block> blocks = UtilityFoncKit.getBlocksInSphere(sheep.getLocation(), radius);
+                        List<Block> blocks = TKit.getBlocksInSphere(sheep.getLocation(), radius);
                         for (Block block : blocks) {
-                            if (UtilityFoncKit.chance(chance) && block.getType().isSolid()) {
+                            if (TKit.chance(chance) && block.getType().isSolid()) {
                                 block.setType(Material.INFESTED_STONE);
                             }
                         }
@@ -495,7 +495,7 @@ public class SheepHandler implements Listener {
                         sheep.getWorld().getNearbyEntities(sheep.getLocation(), radius, radius, radius).forEach(entity -> {
                             // Vérifier que l'entité est un mouton, mais pas un autre Mouton Clone
                             if (entity instanceof Sheep nearbySheep) {
-                                String nearbySheepName = UtilityFoncKit.extractPlainText(nearbySheep.customName());
+                                String nearbySheepName = TKit.extractPlainText(nearbySheep.customName());
                                 if ("Mouton Clone".equals(nearbySheepName)) {
                                     return; // Ne pas dupliquer un autre Mouton Clone
                                 }
@@ -545,9 +545,9 @@ public class SheepHandler implements Listener {
 
                         // Transformer les blocs de laine proches en laines de couleur aléatoire
                         int radius = 3;
-                        List<Block> blocks = UtilityFoncKit.getBlocksInSphere(sheep.getLocation(), radius);
+                        List<Block> blocks = TKit.getBlocksInSphere(sheep.getLocation(), radius);
                         for (Block block : blocks) {
-                            block.setType(Material.valueOf(UtilityFoncKit.getRandomDyeColor().name() + "_WOOL"));
+                            block.setType(Material.valueOf(TKit.getRandomDyeColor().name() + "_WOOL"));
                         }
 
                         sheep.remove();
@@ -567,7 +567,7 @@ public class SheepHandler implements Listener {
                     } else if (countdown[0] > 0) {
                         countdown[0]--;
                     } else {
-                        List<Player> playersInRange = UtilityFoncKit.getPlayersInRadius(sheep.getLocation(), radius);
+                        List<Player> playersInRange = TKit.getPlayersInRadius(sheep.getLocation(), radius,true);
                         for (Player player : playersInRange) {
                             // Projette le joueur violemment dans les airs
                             Vector upward = new Vector(0, 2.5, 0);
@@ -598,7 +598,7 @@ public class SheepHandler implements Listener {
                     } else if (countdown[0] > 0) {
                         countdown[0]--;
                     } else {
-                        List<Player> playersInRange = UtilityFoncKit.getPlayersInRadius(sheep.getLocation(), radius);
+                        List<Player> playersInRange = TKit.getPlayersInRadius(sheep.getLocation(), radius,true);
                         for (Player player : playersInRange) {
                             // Fait tomber un éclair
                             sheep.getWorld().strikeLightningEffect(player.getLocation());
@@ -631,7 +631,7 @@ public class SheepHandler implements Listener {
                     } else if (countdown[0] > 0) {
                         countdown[0]--;
                     } else if (durationTicks[0] > 0) {
-                        List<Player> playersInRange = UtilityFoncKit.getPlayersInRadius(sheep.getLocation(), radius);
+                        List<Player> playersInRange = TKit.getPlayersInRadius(sheep.getLocation(), radius,true);
                         for (Player player : playersInRange) {
                             // Projette le joueur un peu en l'air dans une direction aléatoire
                             Vector randomDirection = new Vector(
@@ -643,9 +643,9 @@ public class SheepHandler implements Listener {
                         }
 
                         // Détruit des blocs dans le rayon
-                        List<Block> blocks = UtilityFoncKit.getBlocksInSphere(sheep.getLocation(), radius);
+                        List<Block> blocks = TKit.getBlocksInSphere(sheep.getLocation(), radius);
                         for (Block block : blocks) {
-                            if (UtilityFoncKit.chance(0.2)) { // 20% de chance
+                            if (TKit.chance(0.2)) { // 20% de chance
                                 block.setType(Material.AIR);
                             }
                         }
@@ -676,7 +676,7 @@ public class SheepHandler implements Listener {
                         task.cancel();
                     } else if (ticksRemaining[0] > 0) {
                         // Détruire les blocs autour du mouton
-                        List<Block> blocksInRadius = UtilityFoncKit.getBlocksInSphere(sheep.getLocation(), radius);
+                        List<Block> blocksInRadius = TKit.getBlocksInSphere(sheep.getLocation(), radius);
                         for (Block block : blocksInRadius) {
                             block.setType(Material.AIR); // Détruire le bloc
                             // Effet visuel
@@ -700,7 +700,7 @@ public class SheepHandler implements Listener {
 
                 // Supprimer la gravité et définir une vitesse constante
                 sheep.setGravity(false);
-                Vector constantVelocity = UtilityFoncKit.getNearestPlayer(sheep.getLocation()).getLocation().getDirection().normalize().multiply(0.2);
+                Vector constantVelocity = TKit.getNearestPlayer(sheep.getLocation(),false).getLocation().getDirection().normalize().multiply(0.2);
                 sheep.setVelocity(constantVelocity);
 
                 plugin.getServer().getScheduler().runTaskTimer(plugin, task -> {
@@ -710,7 +710,7 @@ public class SheepHandler implements Listener {
                     } else if (ticksRemaining[0] > 0) {
                         sheep.setVelocity(constantVelocity);
                         // Détruire les blocs autour du mouton
-                        List<Block> blocksInRadius = UtilityFoncKit.getBlocksInSphere(sheep.getLocation(), radius);
+                        List<Block> blocksInRadius = TKit.getBlocksInSphere(sheep.getLocation(), radius);
                         for (Block block : blocksInRadius) {
                             block.setType(Material.AIR); // Détruire le bloc
                             // Effet visuel
@@ -766,10 +766,10 @@ public class SheepHandler implements Listener {
                         countdown[0]--; // Réduire le compteur
                     } else {
                         double chance = 0.6;
-                        List<Block> blocks = UtilityFoncKit.getBlocksInSphere(sheep.getLocation(), radius);
+                        List<Block> blocks = TKit.getBlocksInSphere(sheep.getLocation(), radius);
                         for (Block block : blocks) {
                             if (block.getType().isSolid() && !block.getRelative(BlockFace.UP).isSolid()) {
-                                if (UtilityFoncKit.chance(chance)) {
+                                if (TKit.chance(chance)) {
                                     block.getRelative(BlockFace.UP).setType(Material.SWEET_BERRY_BUSH);
                                 }
                             }
@@ -795,7 +795,7 @@ public class SheepHandler implements Listener {
                         task.cancel();
                     } else if (ticksRemaining[0] > 0) {
                         // Obtenir le joueur le plus proche
-                        Player nearestPlayer = UtilityFoncKit.getNearestPlayer(sheep.getLocation());
+                        Player nearestPlayer = TKit.getNearestPlayer(sheep.getLocation(),false);
                         if (nearestPlayer != null) {
                             // Utiliser le pathfinding pour se diriger vers le joueur
                             sheep.setAI(true);
@@ -838,7 +838,7 @@ public class SheepHandler implements Listener {
                             double z = radius * Math.sin(angle);
 
                             Location spawnLocation = sheep.getLocation().add(x, 1, z);
-                            Vector direction = UtilityFoncKit.getDirection(sheep.getLocation(),spawnLocation);
+                            Vector direction = TKit.getDirection(sheep.getLocation(),spawnLocation);
                             Sheep instantSheep = (Sheep) sheep.getWorld().spawnEntity(sheep.getLocation(), EntityType.SHEEP);
 
                             // Configurer le mouton comme "instantané"
@@ -846,7 +846,7 @@ public class SheepHandler implements Listener {
                             instantSheep.setBaby();
                             instantSheep.customName(Component.text("Mouton Instantané"));
                             instantSheep.setCustomNameVisible(true);
-                            instantSheep.setColor(UtilityFoncKit.getRandomDyeColor());
+                            instantSheep.setColor(TKit.getRandomDyeColor());
                             applySheepPower(instantSheep); // Activer le pouvoir des moutons instantanés
                         }
 
@@ -865,12 +865,12 @@ public class SheepHandler implements Listener {
                         sheep.remove();
                         task.cancel();
                     } else if (waves[0] > 0) {
-                        List<Player> playersInRadius = UtilityFoncKit.getPlayersInRadius(sheep.getLocation(), radius);
+                        List<Player> playersInRadius = TKit.getPlayersInRadius(sheep.getLocation(), radius,true);
                         for (Player player : playersInRadius) {
                             // Créer une flèche et la diriger vers le joueur
                             Location arrowSpawn = sheep.getLocation().add(0, 1, 0);
                             Arrow arrow = sheep.getWorld().spawnArrow(arrowSpawn,
-                                    UtilityFoncKit.getDirection(arrowSpawn, player.getLocation()),
+                                    TKit.getDirection(arrowSpawn, player.getLocation()),
                                     3.0F, 1);
                             arrow.setShooter(sheep);
                         }
@@ -889,7 +889,7 @@ public class SheepHandler implements Listener {
 
                 plugin.getServer().getScheduler().runTaskLater(plugin, task -> {
                     if (sheep.isValid()) {
-                        List<Player> playersInRadius = UtilityFoncKit.getPlayersInRadius(sheep.getLocation(), radius);
+                        List<Player> playersInRadius = TKit.getPlayersInRadius(sheep.getLocation(), radius,true);
                         for (Player player : playersInRadius) {
                             // Lancer le sort de mâchoire vers chaque joueur
                             sheep.getWorld().spawnEntity(player.getLocation(), EntityType.EVOKER_FANGS);
@@ -915,7 +915,7 @@ public class SheepHandler implements Listener {
                         sheep.remove();
                         task.cancel();
                     } else if (explosions[0] > 0) {
-                        List<Player> playersInRadius = UtilityFoncKit.getPlayersInRadius(sheep.getLocation(), radius);
+                        List<Player> playersInRadius = TKit.getPlayersInRadius(sheep.getLocation(), radius,true);
                         for (Player player : playersInRadius) {
                             // Calculer une position proche du joueur pour l'explosion
                             Location explosionLocation = player.getLocation().add(
@@ -939,7 +939,7 @@ public class SheepHandler implements Listener {
 
                 plugin.getServer().getScheduler().runTaskLater(plugin, task -> {
                     if (sheep.isValid()) {
-                        List<Player> playersInRadius = UtilityFoncKit.getPlayersInRadius(sheep.getLocation(), radius);
+                        List<Player> playersInRadius = TKit.getPlayersInRadius(sheep.getLocation(), radius,true);
                         for (Player player : playersInRadius) {
                             player.addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, 10 * 20, 0)); // Glowing pendant 10 secondes
                         }
@@ -958,7 +958,7 @@ public class SheepHandler implements Listener {
 
                 plugin.getServer().getScheduler().runTaskLater(plugin, task -> {
                     if (sheep.isValid()) {
-                        List<Player> playersInRadius = UtilityFoncKit.getPlayersInRadius(sheep.getLocation(), radius);
+                        List<Player> playersInRadius = TKit.getPlayersInRadius(sheep.getLocation(), radius,true);
                         for (Player player : playersInRadius) {
                             player.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 10 * 20, 0)); // Invisible pendant 10 secondes
                         }
@@ -982,7 +982,7 @@ public class SheepHandler implements Listener {
                         sheep.remove();
                         task.cancel();
                     } else if (waves[0] > 0) {
-                        List<Player> playersInRadius = UtilityFoncKit.getPlayersInRadius(sheep.getLocation(), radius);
+                        List<Player> playersInRadius = TKit.getPlayersInRadius(sheep.getLocation(), radius,true);
                         for (Player player : playersInRadius) {
                             player.addPotionEffect(new PotionEffect(PotionEffectType.INSTANT_HEALTH, 1, 0)); // Soin instantané
                         }
@@ -1003,7 +1003,7 @@ public class SheepHandler implements Listener {
 
                 plugin.getServer().getScheduler().runTaskLater(plugin, task -> {
                     if (sheep.isValid()) {
-                        List<Player> playersInRadius = UtilityFoncKit.getPlayersInRadius(sheep.getLocation(), radius);
+                        List<Player> playersInRadius = TKit.getPlayersInRadius(sheep.getLocation(), radius,true);
 
                         // Appliquer l'effet d'obscurité
                         for (Player player : playersInRadius) {
@@ -1052,9 +1052,9 @@ public class SheepHandler implements Listener {
                 plugin.getServer().getScheduler().runTaskLater(plugin, task -> {
                     if (sheep.isValid()) {
                         // Parcourir les blocs dans le rayon
-                        List<Block> blocksInRadius = UtilityFoncKit.getBlocksInSphere(sheep.getLocation(), radius);
+                        List<Block> blocksInRadius = TKit.getBlocksInSphere(sheep.getLocation(), radius);
                         for (Block block : blocksInRadius) {
-                            if (block.getType().isSolid() && block.getRelative(BlockFace.UP).getType().equals(Material.AIR) && UtilityFoncKit.chance(chance)) {
+                            if (block.getType().isSolid() && block.getRelative(BlockFace.UP).getType().equals(Material.AIR) && TKit.chance(chance)) {
                                 // Faire apparaître une enclume 10 blocs au-dessus
                                 Location anvilLocation = block.getLocation().add(0, 10, 0);
                                 FallingBlock fallingAnvil = block.getWorld().spawn(anvilLocation, FallingBlock.class);
@@ -1080,7 +1080,7 @@ public class SheepHandler implements Listener {
                 int radius = 10; // Rayon pour trouver les joueurs
                 int[] waves = {5}; // Nombre de vagues
                 int delayBetweenWaves = 40; // Délai entre les vagues (0.5 seconde)
-                List<PotionEffectType> positiveEffects = UtilityFoncKit.getPotionEffectsByCategory("Positif");
+                List<PotionEffectType> positiveEffects = TKit.getPotionEffectsByCategory("Positif");
 
                 plugin.getServer().getScheduler().runTaskTimer(plugin, task -> {
                     if (!sheep.isValid()) {
@@ -1088,10 +1088,10 @@ public class SheepHandler implements Listener {
                         task.cancel();
                     } else if (waves[0] > 0){
                         // Trouver les joueurs proches
-                        List<Player> playersInRadius = UtilityFoncKit.getPlayersInRadius(sheep.getLocation(), radius);
+                        List<Player> playersInRadius = TKit.getPlayersInRadius(sheep.getLocation(), radius,true);
                         for (Player player : playersInRadius) {
                             // Obtenir un effet positif aléatoire
-                            PotionEffectType randomEffect = UtilityFoncKit.getRandomPotionEffect(positiveEffects);
+                            PotionEffectType randomEffect = TKit.getRandomPotionEffect(positiveEffects);
 
                             // Créer une potion jetable
                             ItemStack potionItem = new ItemStack(Material.SPLASH_POTION);
@@ -1105,7 +1105,7 @@ public class SheepHandler implements Listener {
                             ThrownPotion thrownPotion = (ThrownPotion) sheep.getWorld().spawnEntity(
                                     sheep.getLocation().add(0, 1, 0), EntityType.POTION);
                             thrownPotion.setItem(potionItem);
-                            thrownPotion.setVelocity(UtilityFoncKit.getDirection(sheep.getLocation(), player.getLocation()).multiply(0.5));
+                            thrownPotion.setVelocity(TKit.getDirection(sheep.getLocation(), player.getLocation()).multiply(0.5));
                         }
                         waves[0]--;
                     } else {
@@ -1119,7 +1119,7 @@ public class SheepHandler implements Listener {
                 int radius = 10; // Rayon pour trouver les joueurs
                 int[] waves = {5}; // Nombre de vagues
                 int delayBetweenWaves = 40; // Délai entre les vagues (0.5 seconde)
-                List<PotionEffectType> positiveEffects = UtilityFoncKit.getPotionEffectsByCategory("Négatif");
+                List<PotionEffectType> positiveEffects = TKit.getPotionEffectsByCategory("Négatif");
 
                 plugin.getServer().getScheduler().runTaskTimer(plugin, task -> {
                     if (!sheep.isValid()) {
@@ -1127,10 +1127,10 @@ public class SheepHandler implements Listener {
                         task.cancel();
                     } else if (waves[0] > 0){
                         // Trouver les joueurs proches
-                        List<Player> playersInRadius = UtilityFoncKit.getPlayersInRadius(sheep.getLocation(), radius);
+                        List<Player> playersInRadius = TKit.getPlayersInRadius(sheep.getLocation(), radius,true);
                         for (Player player : playersInRadius) {
                             // Obtenir un effet positif aléatoire
-                            PotionEffectType randomEffect = UtilityFoncKit.getRandomPotionEffect(positiveEffects);
+                            PotionEffectType randomEffect = TKit.getRandomPotionEffect(positiveEffects);
 
                             // Créer une potion jetable
                             ItemStack potionItem = new ItemStack(Material.SPLASH_POTION);
@@ -1144,7 +1144,7 @@ public class SheepHandler implements Listener {
                             ThrownPotion thrownPotion = (ThrownPotion) sheep.getWorld().spawnEntity(
                                     sheep.getLocation().add(0, 1, 0), EntityType.POTION);
                             thrownPotion.setItem(potionItem);
-                            thrownPotion.setVelocity(UtilityFoncKit.getDirection(sheep.getLocation(), player.getLocation()).multiply(0.5));
+                            thrownPotion.setVelocity(TKit.getDirection(sheep.getLocation(), player.getLocation()).multiply(0.5));
                         }
                         waves[0]--;
                     } else {
@@ -1164,7 +1164,7 @@ public class SheepHandler implements Listener {
                         sheep.remove();
                         task.cancel();
                     } else if (ticksRemaining[0] > 0) {
-                        List<Player> playersInRadius = UtilityFoncKit.getPlayersInRadius(sheep.getLocation(), triggerRadius);
+                        List<Player> playersInRadius = TKit.getPlayersInRadius(sheep.getLocation(), triggerRadius,true);
                         if (!playersInRadius.isEmpty()) {
                             // Explosion si un joueur est proche
                             sheep.getWorld().createExplosion(sheep.getLocation(), 3.0F, false, true);
@@ -1186,10 +1186,10 @@ public class SheepHandler implements Listener {
 
                 plugin.getServer().getScheduler().runTaskLater(plugin, task -> {
                     if (sheep.isValid()) {
-                        List<Player> playersInRadius = UtilityFoncKit.getPlayersInRadius(sheep.getLocation(), radius);
+                        List<Player> playersInRadius = TKit.getPlayersInRadius(sheep.getLocation(), radius,true);
                         for (Player player : playersInRadius) {
                             // Trouver un bloc solide aléatoire
-                            List<Block> solidBlocks = UtilityFoncKit.getOpenAirBlocksAbove(UtilityFoncKit.getBlocksInSphere(sheep.getLocation(), radius));
+                            List<Block> solidBlocks = TKit.getOpenAirBlocksAbove(TKit.getBlocksInSphere(sheep.getLocation(), radius));
 
                             if (!solidBlocks.isEmpty()) {
                                 Block randomBlock = solidBlocks.get(ThreadLocalRandom.current().nextInt(solidBlocks.size()));
@@ -1218,11 +1218,11 @@ public class SheepHandler implements Listener {
                         sheep.remove();
                         task.cancel();
                     } else if (waves[0] > 0){
-                        List<Entity> entitiesInRadius = UtilityFoncKit.getEntitiesInRadius(sheep.getLocation(), radius);
+                        List<Entity> entitiesInRadius = TKit.getEntitiesInRadius(sheep.getLocation(), radius);
                         for (Entity entity : entitiesInRadius) {
                             if ( !entity.equals(sheep) && !(entity instanceof Player) ) {
                                 // Expulser les entités non-joueurs
-                                Vector pushDirection = UtilityFoncKit.getDirection(sheep.getLocation(),entity.getLocation());
+                                Vector pushDirection = TKit.getDirection(sheep.getLocation(),entity.getLocation());
                                 entity.setVelocity(pushDirection.multiply(2.0));
                             }
                         }
@@ -1298,7 +1298,7 @@ public class SheepHandler implements Listener {
         // Créer et renvoyer le composant avec le gradient
         TextColor start = TextColor.fromHexString(startColor);
         TextColor end = TextColor.fromHexString(endColor);
-        return UtilityFoncKit.createGradientText(name, start, end);
+        return TKit.createGradientText(name, start, end);
     }
 
 }

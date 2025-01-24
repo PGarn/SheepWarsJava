@@ -1,11 +1,9 @@
 package me.holypite.sheepWarsJava.Maps;
 
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.World;
+import org.bukkit.util.Vector;
 
-import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class MapManager {
@@ -25,33 +23,36 @@ public class MapManager {
 
     public static void registerMaps() {
         // Exemple de map 1
-        World world1 = Bukkit.getWorld("sheepwars_map1");
-        Location pasteLocation1 = new Location(world1, 0, 64, 0);
-        Location[] team1Spawns1 = {
-                new Location(world1, 100, 64, 100),
-                new Location(world1, 110, 64, 110)
-        };
-        Location[] team2Spawns1 = {
-                new Location(world1, 200, 64, 200),
-                new Location(world1, 210, 64, 210)
-        };
-        MapData map1 = new MapData("map1", Arrays.asList(team1Spawns1), Arrays.asList(team2Spawns1), pasteLocation1);
-        addMap(map1);
+        registerMap(
+                "map1",
+                new Vector(0, 64, 0), // pasteLocation
+                List.of( // team1Spawns
+                        new Vector(100, 64, 100),
+                        new Vector(110, 64, 110)
+                ),
+                List.of( // team2Spawns
+                        new Vector(200, 64, 200),
+                        new Vector(210, 64, 210)
+                )
+        );
 
         // Exemple de map 2
-        World world2 = Bukkit.getWorld("sheepwars_map2");
-        Location pasteLocation2 = new Location(world2, 0, 64, 0);
-        Location[] team1Spawns2 = {
-                new Location(world2, 150, 64, 150),
-                new Location(world2, 160, 64, 160)
-        };
-        Location[] team2Spawns2 = {
-                new Location(world2, 250, 64, 250),
-                new Location(world2, 260, 64, 260)
-        };
-        MapData map2 = new MapData("map2", Arrays.asList(team1Spawns2), Arrays.asList(team2Spawns2), pasteLocation2);
-        addMap(map2);
+        registerMap(
+                "map2",
+                new Vector(0, 64, 0), // pasteLocation
+                List.of( // team1Spawns
+                        new Vector(150, 64, 150),
+                        new Vector(160, 64, 160)
+                ),
+                List.of( // team2Spawns
+                        new Vector(250, 64, 250),
+                        new Vector(260, 64, 260)
+                )
+        );
+    }
 
-        // Ajouter d'autres maps si nécessaire
+    private static void registerMap(String MapName, Vector pasteLocation, List<Vector> team1Spawns, List<Vector> team2Spawns){
+        MapData map = new MapData(MapName, team1Spawns, team2Spawns, pasteLocation);
+        addMap(map);
     }
 }

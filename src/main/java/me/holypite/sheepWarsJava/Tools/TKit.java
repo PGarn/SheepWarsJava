@@ -9,24 +9,18 @@ import org.bukkit.Particle;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
-import org.bukkit.generator.ChunkGenerator;
-import org.bukkit.generator.LimitedRegion;
-import org.bukkit.generator.WorldInfo;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.entity.Entity;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
-import org.jetbrains.annotations.NotNull;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
-public class UtilityFoncKit {
+public class TKit {
     /**
      * Extrait uniquement le texte brut d'un composant Adventure sans les styles, les couleurs ou les enfants.
      *
@@ -238,31 +232,37 @@ public class UtilityFoncKit {
 
 
     /**
-     * Trouve les joueurs dans un rayon donnés.
+     * Trouve les joueurs dans un rayon donné.
      *
      * @param location La position à partir de laquelle chercher.
      * @param radius Le rayon de recherche.
+     * @param ignoreSpectators Indique si les joueurs en mode spectateur doivent être ignorés.
      * @return La liste des joueurs dans le rayon.
      */
-    public static List<Player> getPlayersInRadius(Location location, double radius) {
+    public static List<Player> getPlayersInRadius(Location location, double radius, boolean ignoreSpectators) {
         return location.getWorld().getNearbyEntities(location, radius, radius, radius).stream()
                 .filter(entity -> entity instanceof Player)
                 .map(entity -> (Player) entity)
+                .filter(player -> !ignoreSpectators || player.getGameMode() != GameMode.SPECTATOR) // Filtrer selon le mode spectateur
                 .toList();
     }
-
 
     /**
      * Trouve le joueur le plus proche d'une position donnée.
      *
      * @param location La position à partir de laquelle chercher.
+     * @param ignoreSpectators Indique si les joueurs en mode spectateur doivent être ignorés.
      * @return Le joueur le plus proche ou null s'il n'y a aucun joueur.
      */
-    public static Player getNearestPlayer(Location location) {
+    public static Player getNearestPlayer(Location location, boolean ignoreSpectators) {
         Player nearestPlayer = null;
         double nearestDistance = Double.MAX_VALUE;
 
         for (Player player : location.getWorld().getPlayers()) {
+            if (ignoreSpectators && player.getGameMode() == GameMode.SPECTATOR) {
+                continue; // Ignorer les joueurs en mode spectateur si nécessaire
+            }
+
             double distance = player.getLocation().distance(location);
             if (distance < nearestDistance) {
                 nearestDistance = distance;
@@ -281,7 +281,7 @@ public class UtilityFoncKit {
      */
     public static void messageNearestPlayer(Location location, String message) {
         // Trouver le joueur le plus proche
-        Player nearestPlayer = getNearestPlayer(location);
+        Player nearestPlayer = getNearestPlayer(location,false);
 
         // Vérifier si un joueur a été trouvé
         if (nearestPlayer != null) {
@@ -497,6 +497,50 @@ public class UtilityFoncKit {
             throw new IllegalArgumentException("La liste des effets de potion est vide.");
         }
         return effects.get(ThreadLocalRandom.current().nextInt(effects.size()));
+    }
+
+    /**
+     * Convertit un vecteur en une location dans un monde donné.
+     *
+     * @param world Le monde dans lequel la location doit être créée.
+     * @param vector Le vecteur à convertir.
+     * @return Une location correspondant au vecteur dans le monde spécifié.
+     */
+    public static Location vectorToLocation(org.bukkit.World world, Vector vector) {
+        // Vérifier que le monde et le vecteur ne sont pas nulls
+        if (world == null || vector == null) {
+            throw new IllegalArgumentException("Le monde ou le vecteur ne peut pas être null !");
+        }
+
+        // Convertir le vecteur en Location
+        return new Location(world, vector.getX(), vector.getY(), vector.getZ());
+    }
+
+    /**
+     * Convertit une liste de vecteurs en une liste de locations dans un monde donné.
+     *
+     * @param world Le monde dans lequel les locations doivent être créées.
+     * @param vectors La liste des vecteurs à convertir.
+     * @return Une liste de locations correspondant aux vecteurs dans le monde spécifié.
+     */
+    public static List<Location> vectorsToLocations(org.bukkit.World world, List<Vector> vectors) {
+        // Liste pour stocker les locations résultantes
+        List<Location> locations = new ArrayList<>();
+
+        // Vérifier que le monde et les vecteurs ne sont pas nulls
+        if (world == null || vectors == null) {
+            throw new IllegalArgumentException("Le monde ou la liste des vecteurs ne peut pas être null !");
+        }
+
+        // Parcourir chaque vecteur et le convertir en Location
+        for (Vector vector : vectors) {
+            if (vector != null) {
+                // Créer une location à partir du vecteur dans le monde
+                locations.add(vectorToLocation(world, vector));
+            }
+        }
+
+        return locations;
     }
 
 }

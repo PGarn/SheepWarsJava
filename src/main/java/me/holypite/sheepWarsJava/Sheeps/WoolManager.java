@@ -1,6 +1,6 @@
 package me.holypite.sheepWarsJava.Sheeps;
 
-import me.holypite.sheepWarsJava.Tools.UtilityFoncKit;
+import me.holypite.sheepWarsJava.Tools.TKit;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Material;
@@ -57,7 +57,7 @@ public class WoolManager {
             // Nom de l'objet avec gradient
             TextColor startColor = TextColor.fromHexString(startColorHex);
             TextColor endColor = TextColor.fromHexString(endColorHex);
-            Component displayName = UtilityFoncKit.createGradientText(name, startColor, endColor);
+            Component displayName = TKit.createGradientText(name, startColor, endColor);
             meta.displayName(displayName);
 
             // Description (lore)
@@ -122,7 +122,7 @@ public class WoolManager {
             return null;
         }
 
-        String name = UtilityFoncKit.extractPlainText(entity.customName());
+        String name = TKit.extractPlainText(entity.customName());
         return switch (name) {
             case "Mouton Taupe" -> taupeWool;
             case "Mouton Greta" -> gretaWool;
@@ -165,7 +165,7 @@ public class WoolManager {
     }
 
     public static void giveAllWool(Player player) {
-        UtilityFoncKit.giveItems(
+        TKit.giveItems(
             player,
             taupeWool,
             gretaWool,
